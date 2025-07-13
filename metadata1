@@ -1,0 +1,16 @@
+Yes, you are correct!
+On Solana, token metadata (such as name, symbol, and URI) is no longer stored directly in the token contract itself. Instead, it is managed separately using the Token Metadata Program (originally by Metaplex, now part of Solana's SPL ecosystem as the SPL Token Metadata program).
+How Metadata Works Now
+Token contract (your program): Handles minting, burning, and authority logic, but does not store or manage metadata fields.
+SPL Token Metadata Program: A separate on-chain program that stores and manages metadata for SPL tokens (including Token-2022 mints). This program creates a metadata account (PDA) associated with your mint address, which wallets and explorers read to display token info.
+Key Points:
+Your contract does NOT need to handle metadata directly.
+To set metadata, you (or your launch process) must invoke the SPL Token Metadata program to create and update the metadata account for your mint.
+This is now the standard for all new Solana tokens, including Token-2022.
+What This Means for Your Code
+Your current lib.rs is correct in not handling metadata directly.
+The whitepaper's mention of "metadata stored via Solana’s Token Metadata extension" is accurate, but the implementation is external to your contract.
+If you want to set or update metadata, you would do so via a script or tool that interacts with the SPL Token Metadata program, not by modifying your contract.
+Summary:
+You do not need to add metadata logic to your contract. Instead, use the SPL Token Metadata program to manage your token's metadata. Your contract should focus on minting, burning, and authority logic as it currently does.
+If you need guidance or a script for setting up your token's metadata using the SPL Token Metadata program, let me know!
