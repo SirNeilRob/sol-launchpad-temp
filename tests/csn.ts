@@ -1,38 +1,48 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Csn } from "../target/types/csn";
+import { assert } from "chai";
 
-describe("csn - locked mint", () => {
+describe("csn - full launch flow", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
   const program = anchor.workspace.csn as Program<Csn>;
 
-  const [statePda, ] = anchor.web3.PublicKey.findProgramAddressSync(
-    [Buffer.from("state")],
-    program.programId
-  );
-  const mint = new anchor.web3.PublicKey("45qA6AB2EZa3wUfBGwifw31Qt3iajAwnduLrMMjdcakm");
+  let mint = anchor.web3.Keypair.generate();
+  let distribution = anchor.web3.Keypair.generate();
+  let team = anchor.web3.Keypair.generate();
+  let staking = anchor.web3.Keypair.generate();
+  let treasury = anchor.web3.Keypair.generate();
+  let ido = anchor.web3.Keypair.generate();
+  let lp = anchor.web3.Keypair.generate();
 
-  it("Reads State PDA and checks mint authority", async () => {
-    const state = await program.account.state.fetch(statePda);
-    console.log("State Account:", {
-      mintAuthority: state.mintAuthority.toBase58(),
-      mintedThisYear: state.mintedThisYear.toString(),
-      mintStartTimestamp: state.mintStartTimestamp.toString(),
-    });
-    // This should match the address you revoked or show the "None" public key
+  let statePda: anchor.web3.PublicKey;
+  let bump: number;
+
+  before(async () => {
+    [statePda, bump] = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("state")],
+      program.programId
+    );
+    // Airdrop SOL to payer for fees
+    await provider.connection.requestAirdrop(provider.wallet.publicKey, 2 * anchor.web3.LAMPORTS_PER_SOL);
   });
 
-  it("Checks that mint authority is revoked on-chain", async () => {
-    // Use Solana web3.js to fetch the Mint account directly:
-    const mintAcc = await provider.connection.getParsedAccountInfo(mint);
-    const data = mintAcc.value.data;
-    if (data && "parsed" in data) {
-      const mintInfo = data.parsed.info;
-      console.log("Mint Authority:", mintInfo.mintAuthority); // Should be null
-      console.log("Freeze Authority:", mintInfo.freezeAuthority); // Should be null
-    }
+  it("Initializes the mint and mints full supply to distribution account", async () => {
+    // TODO: Create mint and distribution token account, set up mint authority as state PDA
+    // Call initialize()
+    // Fetch and assert state, mint config, and distribution account balance
   });
 
-  // Optionally: check balances or burns, but no mints!
+  it("Distributes tokens to all 5 destinations", async () => {
+    // TODO: Call distribute() and check balances for team, staking, treasury, ido, lp
+  });
+
+  it("Finalizes and revokes authorities", async () => {
+    // TODO: Call finalize() and check mint/freeze authorities are null
+  });
+
+  it("Prevents further minting after finalize", async () => {
+    // TODO: Try to mint again and expect failure
+  });
 });
