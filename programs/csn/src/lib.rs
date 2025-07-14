@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 // 1. Use Token-2022 CPI interface (not classic anchor_spl::token!)
 use anchor_spl::token_2022::{self, Token2022, MintTo, Burn};
 // 2. Use token_interface for accounts (these work with both legacy SPL and Token-2022 mints)
-use anchor_spl::token_interface::{Mint, TokenAccount};
+use anchor_spl::token::{Mint, TokenAccount};
 use arrayref::array_ref;
 use anchor_spl::token_2022::spl_token_2022::instruction::AuthorityType;
 
@@ -157,26 +157,39 @@ pub struct Initialize<'info> {
     pub state: Account<'info, State>,
     #[account(mut)]
     pub payer: Signer<'info>,
-    #[account(mut)]
-    pub mint: Box<InterfaceAccount<'info, Mint>>,
-    #[account(mut)]
-    pub distribution_account: Box<InterfaceAccount<'info, TokenAccount>>,
+    #[account(init, payer = payer, space = 82, seeds = [b"mint"], bump)]
+    pub mint: Account<'info, Mint>,
+    #[account(init, payer = payer, space = 165, seeds = [b"distribution_vault"], bump)]
+    pub distribution_account: Account<'info, TokenAccount>,
+    #[account(init, payer = payer, space = 165, seeds = [b"team_vault"], bump)]
+    pub team_account: Account<'info, TokenAccount>,
+    #[account(init, payer = payer, space = 165, seeds = [b"staking_vault"], bump)]
+    pub staking_account: Account<'info, TokenAccount>,
+    #[account(init, payer = payer, space = 165, seeds = [b"treasury_vault"], bump)]
+    pub treasury_account: Account<'info, TokenAccount>,
+    #[account(init, payer = payer, space = 165, seeds = [b"ido_vault"], bump)]
+    pub ido_account: Account<'info, TokenAccount>,
+    #[account(init, payer = payer, space = 165, seeds = [b"lp_vault"], bump)]
+    pub lp_account: Account<'info, TokenAccount>,
     pub token_program: Program<'info, Token2022>,
     pub system_program: Program<'info, System>,
 }
 
-// TOKEN-2022 version. Use InterfaceAccount!
+// Use Account<'info, Mint> and Account<'info, TokenAccount> for all vaults and mint
+// Only use InterfaceAccount for cross-program access, not for creation
+// Update MintCSN and BurnCSN to use Account<'info, Mint> and Account<'info, TokenAccount>
+
 #[derive(Accounts)]
 pub struct MintCSN<'info> {
     #[account(mut, seeds = [b"state"], bump)]
     pub state: Account<'info, State>,
     #[account(mut)]
-    pub mint: Box<InterfaceAccount<'info, Mint>>,
+    pub mint: Account<'info, Mint>,
     #[account(signer)]
     /// CHECK: Only used as authority check
     pub mint_authority: AccountInfo<'info>,
     #[account(mut)]
-    pub to: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub to: Account<'info, TokenAccount>,
     pub token_program: Program<'info, Token2022>,
 }
 
@@ -194,9 +207,9 @@ impl<'info> MintCSN<'info> {
 #[derive(Accounts)]
 pub struct BurnCSN<'info> {
     #[account(mut)]
-    pub mint: Box<InterfaceAccount<'info, Mint>>,
+    pub mint: Account<'info, Mint>,
     #[account(mut)]
-    pub from: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub from: Account<'info, TokenAccount>,
     #[account(signer)]
     /// CHECK: Only used as authority check
     pub authority: AccountInfo<'info>,
@@ -216,28 +229,28 @@ impl<'info> BurnCSN<'info> {
 
 #[derive(Accounts)]
 pub struct Distribute<'info> {
-    #[account(mut)]
-    pub distribution_account: Box<InterfaceAccount<'info, TokenAccount>>,
+    #[account(mut, seeds = [b"distribution_vault"], bump)]
+    pub distribution_account: Account<'info, TokenAccount>,
     #[account(signer)]
     /// CHECK: Only used as authority check
     pub distribution_authority: AccountInfo<'info>,
-    #[account(mut)]
-    pub team_account: Box<InterfaceAccount<'info, TokenAccount>>,
-    #[account(mut)]
-    pub staking_account: Box<InterfaceAccount<'info, TokenAccount>>,
-    #[account(mut)]
-    pub treasury_account: Box<InterfaceAccount<'info, TokenAccount>>,
-    #[account(mut)]
-    pub ido_account: Box<InterfaceAccount<'info, TokenAccount>>,
-    #[account(mut)]
-    pub lp_account: Box<InterfaceAccount<'info, TokenAccount>>,
+    #[account(mut, seeds = [b"team_vault"], bump)]
+    pub team_account: Account<'info, TokenAccount>,
+    #[account(mut, seeds = [b"staking_vault"], bump)]
+    pub staking_account: Account<'info, TokenAccount>,
+    #[account(mut, seeds = [b"treasury_vault"], bump)]
+    pub treasury_account: Account<'info, TokenAccount>,
+    #[account(mut, seeds = [b"ido_vault"], bump)]
+    pub ido_account: Account<'info, TokenAccount>,
+    #[account(mut, seeds = [b"lp_vault"], bump)]
+    pub lp_account: Account<'info, TokenAccount>,
     pub token_program: Program<'info, Token2022>,
 }
 
 #[derive(Accounts)]
 pub struct Finalize<'info> {
     #[account(mut)]
-    pub mint: Box<InterfaceAccount<'info, Mint>>,
+    pub mint: Account<'info, Mint>,
     #[account(signer)]
     /// CHECK: Only used as authority check
     pub current_authority: AccountInfo<'info>,
