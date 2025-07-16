@@ -110,7 +110,11 @@ CSN is a Solana-based token with a maximum supply of 100,000,000 tokens. The con
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## ⚠️ Intellectual Property Notice
+
+This code is proprietary and protected under U.S. copyright law.  
+No license is granted for use, distribution, or modification without explicit written permission from the author.  
+Any unauthorized use may result in legal consequences.
 
 ## 🔗 Links
 
