@@ -198,10 +198,10 @@ describe("csn - Token-2022 Launch Flow", () => {
     console.log("\n=== Distributing Tokens ===");
     
     // Use the program's distribute method
-    // The distribution authority is the state PDA, not the payer
+    // The distribution authority is the state PDA, which uses invoke_signed internally
     const distributeTx = await program.methods.distribute(new anchor.BN(uniqueSeed)).accounts({
       distributionAccount: distributionPda,
-      distributionAuthority: statePda, // State PDA is the authority
+      distributionAuthority: statePda, // State PDA is the authority (uses invoke_signed)
       teamAccount: teamPda,
       stakingAccount: stakingPda,
       treasuryAccount: treasuryPda,
@@ -226,8 +226,9 @@ describe("csn - Token-2022 Launch Flow", () => {
     ];
 
     for (const vault of vaults) {
+      console.log(`Checking ${vault.name} vault: ${vault.pda.toBase58()}`);
       const balance = await connection.getTokenAccountBalance(vault.pda);
-      console.log(`✓ ${vault.name} balance: ${balance.value.uiAmount} tokens`);
+      console.log(`✓ ${vault.name} balance: ${balance.value.uiAmount} tokens (expected: ${vault.expected})`);
       assert.equal(balance.value.uiAmount, vault.expected, `${vault.name} should have ${vault.expected} tokens`);
     }
     

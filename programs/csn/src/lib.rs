@@ -358,7 +358,9 @@ pub mod csn {
                     authority: ctx.accounts.distribution_authority.to_account_info(),
                 },
             );
-            token_2022::transfer(cpi_ctx, *amount)?;
+            
+            // Use invoke_signed to prove PDA ownership
+            token_2022::transfer(cpi_ctx.with_signer(&[&[b"state", &unique_seed.to_le_bytes(), &[ctx.bumps.distribution_authority]]]), *amount)?;
 
             msg!("✓ {} vault funded: {} tokens -> {}", vault_name, amount, to.key());
         }
@@ -503,9 +505,9 @@ pub struct Distribute<'info> {
     #[account(mut, seeds = [b"distribution_vault", unique_seed.to_le_bytes().as_ref()], bump)]
     /// CHECK: Token-2022 account, checked in handler
     pub distribution_account: UncheckedAccount<'info>,
-    #[account(signer)]
-    /// CHECK: Only used as authority check
-    pub distribution_authority: AccountInfo<'info>,
+    #[account(seeds = [b"state", unique_seed.to_le_bytes().as_ref()], bump)]
+    /// CHECK: State PDA used for authority, checked in handler
+    pub distribution_authority: Account<'info, State>,
     #[account(mut, seeds = [b"team_vault", unique_seed.to_le_bytes().as_ref()], bump)]
     /// CHECK: Token-2022 account, checked in handler
     pub team_account: UncheckedAccount<'info>,
