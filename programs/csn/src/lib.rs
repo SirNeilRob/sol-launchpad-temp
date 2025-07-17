@@ -6,6 +6,8 @@ use anchor_spl::token_2022::{self, Token2022, MintTo, Burn};
 use anchor_spl::token::{Mint, TokenAccount};
 use arrayref::array_ref;
 use anchor_spl::token_2022::spl_token_2022::instruction::AuthorityType;
+use anchor_lang::solana_program::program::invoke_signed;
+use anchor_lang::solana_program::system_instruction;
 
 pub const CSN_MAX_SUPPLY: u64 = 100_000_000 * 1_000_000_000; // Assuming 9 decimals
 pub const MINT_INTERVAL_SECONDS: i64 = 365 * 24 * 60 * 60; // 1 year
@@ -17,28 +19,272 @@ pub mod csn {
     use super::*;
 
     /// Initialize state PDA, configure mint, and mint full supply to distribution account.
-    pub fn initialize(ctx: Context<Initialize>, mint_authority: Pubkey) -> Result<()> {
+    pub fn initialize(ctx: Context<Initialize>, mint_authority: Pubkey, unique_seed: u64) -> Result<()> {
+        // --- State PDA is created by Anchor #[account(init)] ---
         let state = &mut ctx.accounts.state;
         state.mint_authority = mint_authority;
         state.minted_this_year = 0;
         state.mint_start_timestamp = Clock::get()?.unix_timestamp;
 
-        // --- Check mint config ---
-        let mint = &ctx.accounts.mint;
-        require_eq!(mint.decimals, 9, CustomError::InvalidMintDecimals);
-        require_keys_eq!(mint.mint_authority.unwrap(), ctx.accounts.state.key(), CustomError::InvalidMintAuthority);
-        require!(mint.freeze_authority.is_some(), CustomError::InvalidFreezeAuthority); // Will be revoked later
+        // --- Create the mint using CPI ---
+        let cpi_ctx = CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            anchor_spl::token_2022::InitializeMint {
+                mint: ctx.accounts.mint.to_account_info(),
+                rent: ctx.accounts.rent.to_account_info(),
+            },
+        );
+        token_2022::initialize_mint(cpi_ctx, 9, &ctx.accounts.state.key(), Some(&ctx.accounts.state.key()))?;
+
+        let vault_space = 165;
+        let rent = Rent::get()?;
+        let lamports = rent.minimum_balance(vault_space);
+        let seed = unique_seed.to_le_bytes();
+
+        // --- Create and initialize each vault PDA as a Token-2022 account ---
+        // Distribution
+        {
+            let seeds = [b"distribution_vault" as &[u8], seed.as_ref()];
+            let (pda, bump) = Pubkey::find_program_address(&seeds, ctx.program_id);
+            invoke_signed(
+                &system_instruction::create_account(
+                    ctx.accounts.payer.key,
+                    &pda,
+                    lamports,
+                    vault_space as u64,
+                    &ctx.accounts.token_program.key(),
+                ),
+                &[
+                    ctx.accounts.payer.to_account_info(),
+                    ctx.accounts.distribution_account.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+                &[&[b"distribution_vault", seed.as_ref(), &[bump]]],
+            )?;
+            let cpi_ctx = CpiContext::new(
+                ctx.accounts.token_program.to_account_info(),
+                anchor_spl::token_2022::InitializeAccount3 {
+                    account: ctx.accounts.distribution_account.to_account_info(),
+                    mint: ctx.accounts.mint.to_account_info(),
+                    authority: ctx.accounts.state.to_account_info(),
+                },
+            );
+            token_2022::initialize_account3(cpi_ctx)?;
+        }
+        // Team
+        {
+            let seeds = [b"team_vault" as &[u8], seed.as_ref()];
+            let (pda, bump) = Pubkey::find_program_address(&seeds, ctx.program_id);
+            invoke_signed(
+                &system_instruction::create_account(
+                    ctx.accounts.payer.key,
+                    &pda,
+                    lamports,
+                    vault_space as u64,
+                    &ctx.accounts.token_program.key(),
+                ),
+                &[
+                    ctx.accounts.payer.to_account_info(),
+                    ctx.accounts.team_account.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+                &[&[b"team_vault", seed.as_ref(), &[bump]]],
+            )?;
+            let cpi_ctx = CpiContext::new(
+                ctx.accounts.token_program.to_account_info(),
+                anchor_spl::token_2022::InitializeAccount3 {
+                    account: ctx.accounts.team_account.to_account_info(),
+                    mint: ctx.accounts.mint.to_account_info(),
+                    authority: ctx.accounts.state.to_account_info(),
+                },
+            );
+            token_2022::initialize_account3(cpi_ctx)?;
+        }
+        // Staking
+        {
+            let seeds = [b"staking_vault" as &[u8], seed.as_ref()];
+            let (pda, bump) = Pubkey::find_program_address(&seeds, ctx.program_id);
+            invoke_signed(
+                &system_instruction::create_account(
+                    ctx.accounts.payer.key,
+                    &pda,
+                    lamports,
+                    vault_space as u64,
+                    &ctx.accounts.token_program.key(),
+                ),
+                &[
+                    ctx.accounts.payer.to_account_info(),
+                    ctx.accounts.staking_account.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+                &[&[b"staking_vault", seed.as_ref(), &[bump]]],
+            )?;
+            let cpi_ctx = CpiContext::new(
+                ctx.accounts.token_program.to_account_info(),
+                anchor_spl::token_2022::InitializeAccount3 {
+                    account: ctx.accounts.staking_account.to_account_info(),
+                    mint: ctx.accounts.mint.to_account_info(),
+                    authority: ctx.accounts.state.to_account_info(),
+                },
+            );
+            token_2022::initialize_account3(cpi_ctx)?;
+        }
+        // Treasury
+        {
+            let seeds = [b"treasury_vault" as &[u8], seed.as_ref()];
+            let (pda, bump) = Pubkey::find_program_address(&seeds, ctx.program_id);
+            invoke_signed(
+                &system_instruction::create_account(
+                    ctx.accounts.payer.key,
+                    &pda,
+                    lamports,
+                    vault_space as u64,
+                    &ctx.accounts.token_program.key(),
+                ),
+                &[
+                    ctx.accounts.payer.to_account_info(),
+                    ctx.accounts.treasury_account.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+                &[&[b"treasury_vault", seed.as_ref(), &[bump]]],
+            )?;
+            let cpi_ctx = CpiContext::new(
+                ctx.accounts.token_program.to_account_info(),
+                anchor_spl::token_2022::InitializeAccount3 {
+                    account: ctx.accounts.treasury_account.to_account_info(),
+                    mint: ctx.accounts.mint.to_account_info(),
+                    authority: ctx.accounts.state.to_account_info(),
+                },
+            );
+            token_2022::initialize_account3(cpi_ctx)?;
+        }
+        // IDO
+        {
+            let seeds = [b"ido_vault" as &[u8], seed.as_ref()];
+            let (pda, bump) = Pubkey::find_program_address(&seeds, ctx.program_id);
+            invoke_signed(
+                &system_instruction::create_account(
+                    ctx.accounts.payer.key,
+                    &pda,
+                    lamports,
+                    vault_space as u64,
+                    &ctx.accounts.token_program.key(),
+                ),
+                &[
+                    ctx.accounts.payer.to_account_info(),
+                    ctx.accounts.ido_account.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+                &[&[b"ido_vault", seed.as_ref(), &[bump]]],
+            )?;
+            let cpi_ctx = CpiContext::new(
+                ctx.accounts.token_program.to_account_info(),
+                anchor_spl::token_2022::InitializeAccount3 {
+                    account: ctx.accounts.ido_account.to_account_info(),
+                    mint: ctx.accounts.mint.to_account_info(),
+                    authority: ctx.accounts.state.to_account_info(),
+                },
+            );
+            token_2022::initialize_account3(cpi_ctx)?;
+        }
+        // LP
+        {
+            let seeds = [b"lp_vault" as &[u8], seed.as_ref()];
+            let (pda, bump) = Pubkey::find_program_address(&seeds, ctx.program_id);
+            invoke_signed(
+                &system_instruction::create_account(
+                    ctx.accounts.payer.key,
+                    &pda,
+                    lamports,
+                    vault_space as u64,
+                    &ctx.accounts.token_program.key(),
+                ),
+                &[
+                    ctx.accounts.payer.to_account_info(),
+                    ctx.accounts.lp_account.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+                &[&[b"lp_vault", seed.as_ref(), &[bump]]],
+            )?;
+            let cpi_ctx = CpiContext::new(
+                ctx.accounts.token_program.to_account_info(),
+                anchor_spl::token_2022::InitializeAccount3 {
+                    account: ctx.accounts.lp_account.to_account_info(),
+                    mint: ctx.accounts.mint.to_account_info(),
+                    authority: ctx.accounts.state.to_account_info(),
+                },
+            );
+            token_2022::initialize_account3(cpi_ctx)?;
+        }
+        // Marketing
+        {
+            let seeds = [b"marketing_vault" as &[u8], seed.as_ref()];
+            let (pda, bump) = Pubkey::find_program_address(&seeds, ctx.program_id);
+            invoke_signed(
+                &system_instruction::create_account(
+                    ctx.accounts.payer.key,
+                    &pda,
+                    lamports,
+                    vault_space as u64,
+                    &ctx.accounts.token_program.key(),
+                ),
+                &[
+                    ctx.accounts.payer.to_account_info(),
+                    ctx.accounts.marketing_account.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+                &[&[b"marketing_vault", seed.as_ref(), &[bump]]],
+            )?;
+            let cpi_ctx = CpiContext::new(
+                ctx.accounts.token_program.to_account_info(),
+                anchor_spl::token_2022::InitializeAccount3 {
+                    account: ctx.accounts.marketing_account.to_account_info(),
+                    mint: ctx.accounts.mint.to_account_info(),
+                    authority: ctx.accounts.state.to_account_info(),
+                },
+            );
+            token_2022::initialize_account3(cpi_ctx)?;
+        }
+        // Airdrop
+        {
+            let seeds = [b"airdrop_vault" as &[u8], seed.as_ref()];
+            let (pda, bump) = Pubkey::find_program_address(&seeds, ctx.program_id);
+            invoke_signed(
+                &system_instruction::create_account(
+                    ctx.accounts.payer.key,
+                    &pda,
+                    lamports,
+                    vault_space as u64,
+                    &ctx.accounts.token_program.key(),
+                ),
+                &[
+                    ctx.accounts.payer.to_account_info(),
+                    ctx.accounts.airdrop_account.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+                &[&[b"airdrop_vault", seed.as_ref(), &[bump]]],
+            )?;
+            let cpi_ctx = CpiContext::new(
+                ctx.accounts.token_program.to_account_info(),
+                anchor_spl::token_2022::InitializeAccount3 {
+                    account: ctx.accounts.airdrop_account.to_account_info(),
+                    mint: ctx.accounts.mint.to_account_info(),
+                    authority: ctx.accounts.state.to_account_info(),
+                },
+            );
+            token_2022::initialize_account3(cpi_ctx)?;
+        }
 
         // --- Mint full supply to distribution account ---
         let cpi_ctx = CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
             MintTo {
-                mint: mint.to_account_info(),
+                mint: ctx.accounts.mint.to_account_info(),
                 to: ctx.accounts.distribution_account.to_account_info(),
                 authority: ctx.accounts.state.to_account_info(),
             },
         );
-        token_2022::mint_to(cpi_ctx.with_signer(&[&[b"state", &[ctx.bumps.state]]]), CSN_MAX_SUPPLY)?;
+        token_2022::mint_to(cpi_ctx.with_signer(&[&[b"state", &unique_seed.to_le_bytes(), &[ctx.bumps.state]]]), CSN_MAX_SUPPLY)?;
         Ok(())
     }
 
@@ -86,16 +332,24 @@ pub mod csn {
         Ok(())
     }
 
-    /// Distribute the full supply from the distribution account to all allocation destinations.
-    pub fn distribute(ctx: Context<Distribute>) -> Result<()> {
+    /// Distribute the launch circulating supply from the distribution account to all allocation destinations per whitepaper.
+    pub fn distribute(ctx: Context<Distribute>, unique_seed: u64) -> Result<()> {
+        // Whitepaper launch allocations (all amounts in base units, 9 decimals)
         let allocations = [
-            (ctx.accounts.team_account.to_account_info(), 27_500_000 * 1_000_000_000u64),
-            (ctx.accounts.staking_account.to_account_info(), 40_000_000 * 1_000_000_000u64),
-            (ctx.accounts.treasury_account.to_account_info(), 15_000_000 * 1_000_000_000u64),
-            (ctx.accounts.ido_account.to_account_info(), 14_000_000 * 1_000_000_000u64),
-            (ctx.accounts.lp_account.to_account_info(), 4_000_000 * 1_000_000_000u64),
+            (ctx.accounts.staking_account.to_account_info(), 3_000_000 * 1_000_000_000u64, "Staking"),
+            (ctx.accounts.treasury_account.to_account_info(), 2_000_000 * 1_000_000_000u64, "Treasury"),
+            (ctx.accounts.ido_account.to_account_info(), 14_000_000 * 1_000_000_000u64, "IDO"),
+            (ctx.accounts.marketing_account.to_account_info(), 7_000_000 * 1_000_000_000u64, "Marketing"),
+            (ctx.accounts.airdrop_account.to_account_info(), 2_000_000 * 1_000_000_000u64, "Airdrop"),
+            // Team and LP vaults are not funded at launch (all locked or reserved)
         ];
-        for (to, amount) in allocations.iter() {
+
+        msg!("=== CSN Token Launch Distribution ===");
+        msg!("Distribution Account: {}", ctx.accounts.distribution_account.key());
+
+        for (to, amount, vault_name) in allocations.iter() {
+            msg!("Transferring {} tokens to {} vault: {}", amount, vault_name, to.key());
+
             let cpi_ctx = CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
                 anchor_spl::token_2022::Transfer {
@@ -105,22 +359,27 @@ pub mod csn {
                 },
             );
             token_2022::transfer(cpi_ctx, *amount)?;
+
+            msg!("✓ {} vault funded: {} tokens -> {}", vault_name, amount, to.key());
         }
+
+        msg!("=== Launch Distribution Complete ===");
+        msg!("All launch vaults funded successfully!");
         Ok(())
     }
 
     /// Finalize: revoke mint and freeze authorities for the mint.
-    pub fn finalize(ctx: Context<Finalize>) -> Result<()> {
+    pub fn finalize(ctx: Context<Finalize>, unique_seed: u64) -> Result<()> {
         // Revoke mint authority
         let cpi_ctx_mint = CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
             anchor_spl::token_2022::SetAuthority {
                 account_or_mint: ctx.accounts.mint.to_account_info(),
-                current_authority: ctx.accounts.current_authority.to_account_info(),
+                current_authority: ctx.accounts.state.to_account_info(),
             },
         );
         token_2022::set_authority(
-            cpi_ctx_mint,
+            cpi_ctx_mint.with_signer(&[&[b"state", &unique_seed.to_le_bytes(), &[ctx.bumps.state]]]),
             AuthorityType::MintTokens,
             None,
         )?;
@@ -130,11 +389,11 @@ pub mod csn {
             ctx.accounts.token_program.to_account_info(),
             anchor_spl::token_2022::SetAuthority {
                 account_or_mint: ctx.accounts.mint.to_account_info(),
-                current_authority: ctx.accounts.current_authority.to_account_info(),
+                current_authority: ctx.accounts.state.to_account_info(),
             },
         );
         token_2022::set_authority(
-            cpi_ctx_freeze,
+            cpi_ctx_freeze.with_signer(&[&[b"state", &unique_seed.to_le_bytes(), &[ctx.bumps.state]]]),
             AuthorityType::FreezeAccount,
             None,
         )?;
@@ -152,32 +411,43 @@ pub struct State {
 // ------------- ACCOUNTS -------------
 
 #[derive(Accounts)]
+#[instruction(mint_authority: Pubkey, unique_seed: u64)]
 pub struct Initialize<'info> {
-    #[account(init, payer = payer, space = 8 + 32 + 8 + 8, seeds = [b"state"], bump)]
+    #[account(init, payer = payer, space = 8 + 32 + 8 + 8, seeds = [b"state", unique_seed.to_le_bytes().as_ref()], bump)]
     pub state: Account<'info, State>,
     #[account(mut)]
     pub payer: Signer<'info>,
-    #[account(init, payer = payer, space = 82, seeds = [b"mint"], bump)]
-    pub mint: Account<'info, Mint>,
-    #[account(init, payer = payer, space = 165, seeds = [b"distribution_vault"], bump)]
-    pub distribution_account: Account<'info, TokenAccount>,
-    #[account(init, payer = payer, space = 165, seeds = [b"team_vault"], bump)]
-    pub team_account: Account<'info, TokenAccount>,
-    #[account(init, payer = payer, space = 165, seeds = [b"staking_vault"], bump)]
-    pub staking_account: Account<'info, TokenAccount>,
-    #[account(init, payer = payer, space = 165, seeds = [b"treasury_vault"], bump)]
-    pub treasury_account: Account<'info, TokenAccount>,
-    #[account(init, payer = payer, space = 165, seeds = [b"ido_vault"], bump)]
-    pub ido_account: Account<'info, TokenAccount>,
-    #[account(init, payer = payer, space = 165, seeds = [b"lp_vault"], bump)]
-    pub lp_account: Account<'info, TokenAccount>,
+    #[account(mut)]
+    /// CHECK: Mint account will be created via CPI to Token-2022 program
+    pub mint: UncheckedAccount<'info>,
+    #[account(mut)]
+    /// CHECK: Distribution vault will be created via CPI to Token-2022 program
+    pub distribution_account: UncheckedAccount<'info>,
+    #[account(mut)]
+    /// CHECK: Team vault will be created via CPI to Token-2022 program
+    pub team_account: UncheckedAccount<'info>,
+    #[account(mut)]
+    /// CHECK: Staking vault will be created via CPI to Token-2022 program
+    pub staking_account: UncheckedAccount<'info>,
+    #[account(mut)]
+    /// CHECK: Treasury vault will be created via CPI to Token-2022 program
+    pub treasury_account: UncheckedAccount<'info>,
+    #[account(mut)]
+    /// CHECK: IDO vault will be created via CPI to Token-2022 program
+    pub ido_account: UncheckedAccount<'info>,
+    #[account(mut)]
+    /// CHECK: LP vault will be created via CPI to Token-2022 program
+    pub lp_account: UncheckedAccount<'info>,
+    #[account(mut)]
+    /// CHECK: Marketing vault will be created via CPI to Token-2022 program
+    pub marketing_account: UncheckedAccount<'info>,
+    #[account(mut)]
+    /// CHECK: Airdrop vault will be created via CPI to Token-2022 program
+    pub airdrop_account: UncheckedAccount<'info>,
     pub token_program: Program<'info, Token2022>,
     pub system_program: Program<'info, System>,
+    pub rent: Sysvar<'info, Rent>,
 }
-
-// Use Account<'info, Mint> and Account<'info, TokenAccount> for all vaults and mint
-// Only use InterfaceAccount for cross-program access, not for creation
-// Update MintCSN and BurnCSN to use Account<'info, Mint> and Account<'info, TokenAccount>
 
 #[derive(Accounts)]
 pub struct MintCSN<'info> {
@@ -228,29 +498,49 @@ impl<'info> BurnCSN<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(unique_seed: u64)]
 pub struct Distribute<'info> {
-    #[account(mut, seeds = [b"distribution_vault"], bump)]
-    pub distribution_account: Account<'info, TokenAccount>,
+    #[account(mut, seeds = [b"distribution_vault", unique_seed.to_le_bytes().as_ref()], bump)]
+    /// CHECK: Token-2022 account, checked in handler
+    pub distribution_account: UncheckedAccount<'info>,
     #[account(signer)]
     /// CHECK: Only used as authority check
     pub distribution_authority: AccountInfo<'info>,
-    #[account(mut, seeds = [b"team_vault"], bump)]
-    pub team_account: Account<'info, TokenAccount>,
-    #[account(mut, seeds = [b"staking_vault"], bump)]
-    pub staking_account: Account<'info, TokenAccount>,
-    #[account(mut, seeds = [b"treasury_vault"], bump)]
-    pub treasury_account: Account<'info, TokenAccount>,
-    #[account(mut, seeds = [b"ido_vault"], bump)]
-    pub ido_account: Account<'info, TokenAccount>,
-    #[account(mut, seeds = [b"lp_vault"], bump)]
-    pub lp_account: Account<'info, TokenAccount>,
+    #[account(mut, seeds = [b"team_vault", unique_seed.to_le_bytes().as_ref()], bump)]
+    /// CHECK: Token-2022 account, checked in handler
+    pub team_account: UncheckedAccount<'info>,
+    #[account(mut, seeds = [b"staking_vault", unique_seed.to_le_bytes().as_ref()], bump)]
+    /// CHECK: Token-2022 account, checked in handler
+    pub staking_account: UncheckedAccount<'info>,
+    #[account(mut, seeds = [b"treasury_vault", unique_seed.to_le_bytes().as_ref()], bump)]
+    /// CHECK: Token-2022 account, checked in handler
+    pub treasury_account: UncheckedAccount<'info>,
+    #[account(mut, seeds = [b"ido_vault", unique_seed.to_le_bytes().as_ref()], bump)]
+    /// CHECK: Token-2022 account, checked in handler
+    pub ido_account: UncheckedAccount<'info>,
+    #[account(mut, seeds = [b"lp_vault", unique_seed.to_le_bytes().as_ref()], bump)]
+    /// CHECK: Token-2022 account, checked in handler
+    pub lp_account: UncheckedAccount<'info>,
+    #[account(mut, seeds = [b"marketing_vault", unique_seed.to_le_bytes().as_ref()], bump)]
+    /// CHECK: Token-2022 account, checked in handler
+    pub marketing_account: UncheckedAccount<'info>,
+    #[account(mut, seeds = [b"airdrop_vault", unique_seed.to_le_bytes().as_ref()], bump)]
+    /// CHECK: Token-2022 account, checked in handler
+    pub airdrop_account: UncheckedAccount<'info>,
+    #[account(mut)]
+    /// CHECK: Mint account is checked in handler
+    pub mint: UncheckedAccount<'info>,
     pub token_program: Program<'info, Token2022>,
 }
 
 #[derive(Accounts)]
+#[instruction(unique_seed: u64)]
 pub struct Finalize<'info> {
+    #[account(seeds = [b"state", unique_seed.to_le_bytes().as_ref()], bump)]
+    pub state: Account<'info, State>,
     #[account(mut)]
-    pub mint: Account<'info, Mint>,
+    /// CHECK: Mint account is checked in handler
+    pub mint: UncheckedAccount<'info>,
     #[account(signer)]
     /// CHECK: Only used as authority check
     pub current_authority: AccountInfo<'info>,
