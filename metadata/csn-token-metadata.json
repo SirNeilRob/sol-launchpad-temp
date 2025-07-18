@@ -1,0 +1,44 @@
+{
+  "name": "CSN Token",
+  "symbol": "CSN",
+  "description": "CSN is a Solana-based token with controlled minting, time-locks, and secure vault distribution.",
+  "image": "https://raw.githubusercontent.com/your-repo/csn-token/main/logo.png",
+  "external_url": "https://csn-token.com",
+  "attributes": [
+    {
+      "trait_type": "Supply Cap",
+      "value": "100,000,000"
+    },
+    {
+      "trait_type": "Decimals",
+      "value": "9"
+    },
+    {
+      "trait_type": "Standard",
+      "value": "Token-2022"
+    },
+    {
+      "trait_type": "Network",
+      "value": "Solana"
+    },
+    {
+      "trait_type": "Minting",
+      "value": "Time-locked"
+    },
+    {
+      "trait_type": "Authority",
+      "value": "PDA-controlled"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "type": "image/png",
+        "uri": "https://raw.githubusercontent.com/your-repo/csn-token/main/logo.png"
+      }
+    ],
+    "category": "image",
+    "maxSupply": 100000000,
+    "decimals": 9
+  }
+}
