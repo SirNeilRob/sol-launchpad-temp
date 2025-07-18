@@ -2,7 +2,7 @@
   "name": "CSN Token",
   "symbol": "CSN",
   "description": "CSN is a Solana-based token with controlled minting, time-locks, and secure vault distribution.",
-  "image": "https://raw.githubusercontent.com/your-repo/csn-token/main/logo.png",
+  "image": "https://raw.githubusercontent.com/SirNeilRob/csn-token/main/assets/CryptoSun.jpeg",
   "external_url": "https://csn-token.com",
   "attributes": [
     {
@@ -34,7 +34,7 @@
     "files": [
       {
         "type": "image/png",
-        "uri": "https://raw.githubusercontent.com/your-repo/csn-token/main/logo.png"
+        "uri": "https://raw.githubusercontent.com/SirNeilRob/csn-token/main/assets/CryptoSun.jpeg"
       }
     ],
     "category": "image",

@@ -20,7 +20,7 @@ pub const CSN_TOKEN_NAME: &str = "CSN Token";
 pub const CSN_TOKEN_SYMBOL: &str = "CSN";
 pub const CSN_TOKEN_DECIMALS: u8 = 9;
 pub const CSN_TOKEN_DESCRIPTION: &str = "CSN is a Solana-based token with controlled minting, time-locks, and secure vault distribution.";
-pub const CSN_TOKEN_IMAGE: &str = "https://raw.githubusercontent.com/your-repo/csn-token/main/logo.png";
+pub const CSN_TOKEN_IMAGE: &str = "https://raw.githubusercontent.com/SirNeilRob/csn-token/main/assets/CryptoSun.jpeg";
 pub const CSN_TOKEN_EXTERNAL_URL: &str = "https://csn-token.com";
 `);
 
