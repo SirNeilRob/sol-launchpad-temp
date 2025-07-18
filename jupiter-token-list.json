@@ -1,0 +1,18 @@
+[
+  {
+    "address": "3Mps6KXh8zzJDMYCnucUJLtqgRRJQ6NpAZ7kEkxEWnm5",
+    "chainId": 101,
+    "decimals": 9,
+    "image": "https://raw.githubusercontent.com/SirNeilRob/csn-token/main/assets/CryptoSun.jpeg",
+    "name": "CSN Token",
+    "symbol": "CSN",
+    "tags": ["token-2022"],
+    "extensions": {
+      "website": "https://csn-token.com",
+      "twitter": "https://twitter.com/csntoken",
+      "discord": "https://discord.gg/csntoken",
+      "description": "CSN is a Solana-based token with controlled minting, time-locks, and secure vault distribution.",
+      "coingeckoId": "csn-token"
+    }
+  }
+] 

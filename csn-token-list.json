@@ -1,0 +1,39 @@
+{
+  "name": "CSN Token",
+  "symbol": "CSN",
+  "logoURI": "https://raw.githubusercontent.com/SirNeilRob/csn-token/main/assets/CryptoSun.jpeg",
+  "tags": ["token-2022", "defi", "governance"],
+  "extensions": {
+    "website": "https://csn-token.com",
+    "twitter": "https://twitter.com/csntoken",
+    "discord": "https://discord.gg/csntoken",
+    "description": "CSN is a Solana-based token with controlled minting, time-locks, and secure vault distribution."
+  },
+  "tokens": [
+    {
+      "chainId": 101,
+      "address": "3Mps6KXh8zzJDMYCnucUJLtqgRRJQ6NpAZ7kEkxEWnm5",
+      "symbol": "CSN",
+      "name": "CSN Token",
+      "decimals": 9,
+      "logoURI": "https://raw.githubusercontent.com/SirNeilRob/csn-token/main/assets/CryptoSun.jpeg",
+      "tags": ["token-2022"],
+      "extensions": {
+        "website": "https://csn-token.com",
+        "twitter": "https://twitter.com/csntoken",
+        "discord": "https://discord.gg/csntoken",
+        "description": "CSN is a Solana-based token with controlled minting, time-locks, and secure vault distribution.",
+        "coingeckoId": "csn-token",
+        "serumV3Usdc": "CSN/USDC",
+        "serumV3Usdt": "CSN/USDT",
+        "raydium": "CSN/USDC",
+        "orca": "CSN/USDC"
+      }
+    }
+  ],
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  }
+} 
