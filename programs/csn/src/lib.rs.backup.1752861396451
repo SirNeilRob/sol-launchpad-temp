@@ -13,14 +13,6 @@ pub const CSN_MAX_SUPPLY: u64 = 100_000_000 * 1_000_000_000; // Assuming 9 decim
 pub const MINT_INTERVAL_SECONDS: i64 = 365 * 24 * 60 * 60; // 1 year
 pub const YEARLY_MINT_LIMIT: u64 = 5_000_000 * 1_000_000_000; // 5M tokens per year max
 
-// Metadata constants for CSN token
-pub const CSN_TOKEN_NAME: &str = "CSN Token";
-pub const CSN_TOKEN_SYMBOL: &str = "CSN";
-pub const CSN_TOKEN_DECIMALS: u8 = 9;
-pub const CSN_TOKEN_DESCRIPTION: &str = "CSN is a Solana-based token with controlled minting, time-locks, and secure vault distribution.";
-pub const CSN_TOKEN_IMAGE: &str = "https://raw.githubusercontent.com/SirNeilRob/csn-token/main/assets/CryptoSun.jpeg";
-pub const CSN_TOKEN_EXTERNAL_URL: &str = "https://csn-token.com";
-
 declare_id!("7ZZQ1sXhFh5pkwaqGxtukNo9ma4n4VLjszzk3hChj5tN"); // <--- Your deployed program ID
 
 #[program]
@@ -30,13 +22,10 @@ pub mod csn {
     /// Initialize state PDA, configure mint, and mint full supply to distribution account.
     pub fn initialize(ctx: Context<Initialize>, mint_authority: Pubkey, unique_seed: u64) -> Result<()> {
         // --- State PDA is created by Anchor #[account(init)] ---
-        let state_key = ctx.accounts.state.key();
-        let state_account_info = ctx.accounts.state.to_account_info();
         let state = &mut ctx.accounts.state;
         state.mint_authority = mint_authority;
         state.minted_this_year = 0;
         state.mint_start_timestamp = Clock::get()?.unix_timestamp;
-        state.metadata = TokenMetadata::default(); // Initialize with default metadata
 
         // --- Create the mint using CPI ---
         let cpi_ctx = CpiContext::new(
@@ -46,7 +35,7 @@ pub mod csn {
                 rent: ctx.accounts.rent.to_account_info(),
             },
         );
-        token_2022::initialize_mint(cpi_ctx, 9, &state_key, Some(&state_key))?;
+        token_2022::initialize_mint(cpi_ctx, 9, &ctx.accounts.state.key(), Some(&ctx.accounts.state.key()))?;
 
         let vault_space = 165;
         let rent = Rent::get()?;
@@ -78,7 +67,7 @@ pub mod csn {
                 anchor_spl::token_2022::InitializeAccount3 {
                     account: ctx.accounts.distribution_account.to_account_info(),
                     mint: ctx.accounts.mint.to_account_info(),
-                    authority: state_account_info.clone(),
+                    authority: ctx.accounts.state.to_account_info(),
                 },
             );
             token_2022::initialize_account3(cpi_ctx)?;
@@ -107,7 +96,7 @@ pub mod csn {
                 anchor_spl::token_2022::InitializeAccount3 {
                     account: ctx.accounts.team_account.to_account_info(),
                     mint: ctx.accounts.mint.to_account_info(),
-                    authority: state_account_info.clone(),
+                    authority: ctx.accounts.state.to_account_info(),
                 },
             );
             token_2022::initialize_account3(cpi_ctx)?;
@@ -136,7 +125,7 @@ pub mod csn {
                 anchor_spl::token_2022::InitializeAccount3 {
                     account: ctx.accounts.staking_account.to_account_info(),
                     mint: ctx.accounts.mint.to_account_info(),
-                    authority: state_account_info.clone(),
+                    authority: ctx.accounts.state.to_account_info(),
                 },
             );
             token_2022::initialize_account3(cpi_ctx)?;
@@ -165,7 +154,7 @@ pub mod csn {
                 anchor_spl::token_2022::InitializeAccount3 {
                     account: ctx.accounts.treasury_account.to_account_info(),
                     mint: ctx.accounts.mint.to_account_info(),
-                    authority: state_account_info.clone(),
+                    authority: ctx.accounts.state.to_account_info(),
                 },
             );
             token_2022::initialize_account3(cpi_ctx)?;
@@ -194,7 +183,7 @@ pub mod csn {
                 anchor_spl::token_2022::InitializeAccount3 {
                     account: ctx.accounts.ido_account.to_account_info(),
                     mint: ctx.accounts.mint.to_account_info(),
-                    authority: state_account_info.clone(),
+                    authority: ctx.accounts.state.to_account_info(),
                 },
             );
             token_2022::initialize_account3(cpi_ctx)?;
@@ -223,7 +212,7 @@ pub mod csn {
                 anchor_spl::token_2022::InitializeAccount3 {
                     account: ctx.accounts.lp_account.to_account_info(),
                     mint: ctx.accounts.mint.to_account_info(),
-                    authority: state_account_info.clone(),
+                    authority: ctx.accounts.state.to_account_info(),
                 },
             );
             token_2022::initialize_account3(cpi_ctx)?;
@@ -252,7 +241,7 @@ pub mod csn {
                 anchor_spl::token_2022::InitializeAccount3 {
                     account: ctx.accounts.marketing_account.to_account_info(),
                     mint: ctx.accounts.mint.to_account_info(),
-                    authority: state_account_info.clone(),
+                    authority: ctx.accounts.state.to_account_info(),
                 },
             );
             token_2022::initialize_account3(cpi_ctx)?;
@@ -281,7 +270,7 @@ pub mod csn {
                 anchor_spl::token_2022::InitializeAccount3 {
                     account: ctx.accounts.airdrop_account.to_account_info(),
                     mint: ctx.accounts.mint.to_account_info(),
-                    authority: state_account_info.clone(),
+                    authority: ctx.accounts.state.to_account_info(),
                 },
             );
             token_2022::initialize_account3(cpi_ctx)?;
@@ -293,19 +282,10 @@ pub mod csn {
             MintTo {
                 mint: ctx.accounts.mint.to_account_info(),
                 to: ctx.accounts.distribution_account.to_account_info(),
-                authority: state_account_info.clone(),
+                authority: ctx.accounts.state.to_account_info(),
             },
         );
         token_2022::mint_to(cpi_ctx.with_signer(&[&[b"state", &unique_seed.to_le_bytes(), &[ctx.bumps.state]]]), CSN_MAX_SUPPLY)?;
-        
-        // Log metadata information
-        msg!("CSN Token initialized with metadata:");
-        msg!("Name: {}", state.metadata.name);
-        msg!("Symbol: {}", state.metadata.symbol);
-        msg!("Decimals: {}", state.metadata.decimals);
-        msg!("Max Supply: {}", state.metadata.max_supply);
-        msg!("Image: {}", state.metadata.image);
-        
         Ok(())
     }
 
@@ -439,50 +419,6 @@ pub mod csn {
         )?;
         Ok(())
     }
-
-    /// Update token metadata (must be called by mint authority)
-    pub fn update_metadata(ctx: Context<UpdateMetadata>, new_metadata: TokenMetadata) -> Result<()> {
-        require_keys_eq!(
-            ctx.accounts.authority.key(),
-            ctx.accounts.state.mint_authority,
-            CustomError::Unauthorized
-        );
-        
-        let state = &mut ctx.accounts.state;
-        state.metadata = new_metadata;
-        
-        msg!("CSN Token metadata updated successfully");
-        msg!("Name: {}", state.metadata.name);
-        msg!("Symbol: {}", state.metadata.symbol);
-        msg!("Image: {}", state.metadata.image);
-        Ok(())
-    }
-}
-
-// Metadata structure for your token
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug)]
-pub struct TokenMetadata {
-    pub name: String,
-    pub symbol: String,
-    pub description: String,
-    pub image: String,
-    pub external_url: String,
-    pub decimals: u8,
-    pub max_supply: u64,
-}
-
-impl Default for TokenMetadata {
-    fn default() -> Self {
-        Self {
-            name: CSN_TOKEN_NAME.to_string(),
-            symbol: CSN_TOKEN_SYMBOL.to_string(),
-            description: CSN_TOKEN_DESCRIPTION.to_string(),
-            image: CSN_TOKEN_IMAGE.to_string(),
-            external_url: CSN_TOKEN_EXTERNAL_URL.to_string(),
-            decimals: CSN_TOKEN_DECIMALS,
-            max_supply: CSN_MAX_SUPPLY,
-        }
-    }
 }
 
 #[account]
@@ -490,7 +426,6 @@ pub struct State {
     pub mint_authority: Pubkey,
     pub minted_this_year: u64,
     pub mint_start_timestamp: i64,
-    pub metadata: TokenMetadata, // Add metadata field
 }
 
 // ------------- ACCOUNTS -------------
@@ -498,12 +433,7 @@ pub struct State {
 #[derive(Accounts)]
 #[instruction(mint_authority: Pubkey, unique_seed: u64)]
 pub struct Initialize<'info> {
-    // Space calculation:
-    // 8 (discriminator) + 32 (mint_authority) + 8 (minted_this_year) + 8 (mint_start_timestamp) +
-    // 4 (metadata.name len) + 32 (metadata.name) + 4 (metadata.symbol len) + 32 (metadata.symbol) +
-    // 4 (metadata.description len) + 32 (metadata.description) + 4 (metadata.image len) + 32 (metadata.image) +
-    // 4 (metadata.external_url len) + 32 (metadata.external_url) + 8 (metadata.decimals) + 8 (metadata.max_supply)
-    #[account(init, payer = payer, space = 8 + 32 + 8 + 8 + 4 + 32 + 4 + 32 + 4 + 32 + 4 + 32 + 4 + 32 + 8 + 8, seeds = [b"state", unique_seed.to_le_bytes().as_ref()], bump)]
+    #[account(init, payer = payer, space = 8 + 32 + 8 + 8, seeds = [b"state", unique_seed.to_le_bytes().as_ref()], bump)]
     pub state: Account<'info, State>,
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -635,15 +565,6 @@ pub struct Finalize<'info> {
     /// CHECK: Only used as authority check
     pub current_authority: AccountInfo<'info>,
     pub token_program: Program<'info, Token2022>,
-}
-
-#[derive(Accounts)]
-pub struct UpdateMetadata<'info> {
-    #[account(mut, seeds = [b"state"], bump)]
-    pub state: Account<'info, State>,
-    #[account(signer)]
-    /// CHECK: Only used as authority check
-    pub authority: AccountInfo<'info>,
 }
 
 #[error_code]
