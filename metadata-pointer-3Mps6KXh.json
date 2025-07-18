@@ -1,0 +1,13 @@
+{
+  "mint": "3Mps6KXh8zzJDMYCnucUJLtqgRRJQ6NpAZ7kEkxEWnm5",
+  "metadata_url": "https://raw.githubusercontent.com/SirNeilRob/csn-token/main/csn-token-3Mps6KXh.json",
+  "image_url": "https://raw.githubusercontent.com/SirNeilRob/csn-token/main/assets/CryptoSun.jpeg",
+  "explorer_url": "https://explorer.solana.com/address/3Mps6KXh8zzJDMYCnucUJLtqgRRJQ6NpAZ7kEkxEWnm5?cluster=devnet",
+  "token_info": {
+    "name": "CSN Token",
+    "symbol": "CSN",
+    "decimals": 9,
+    "supply": "100,000,000",
+    "standard": "Token-2022"
+  }
+}
