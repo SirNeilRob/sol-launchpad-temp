@@ -1,131 +1,138 @@
-# CSN Token - Solana Token-2022 Implementation
+Solana Launchpad Template – Token-2022 Implementation
+A secure and extensible token launchpad contract built on Solana using the Token-2022 standard. Includes support for fixed supply tokens, controlled minting, time-locked vesting, and PDA-managed authority controls.
 
-A secure, controlled-minting token contract built on Solana using the Token-2022 program with fixed supply, time-locked minting, and authority controls.
+🚀 Overview
+This launchpad provides a reusable Solana smart contract framework for launching SPL Token-2022 assets with enhanced controls, supply caps, and vesting schedules. Originally built for the CSN token, this template can be customized for any project.
 
-## 🚀 Overview
+✨ Key Features
+Fixed Supply Enforcement: Cap total minted tokens at a preset maximum
 
-CSN is a Solana-based token with a maximum supply of 100,000,000 tokens. The contract implements controlled minting with time-lock mechanisms and supply cap enforcement.
+Time-Locked Minting: Restrict minting frequency (e.g., once per year)
 
-## ✨ Features
+Authority Controls: Only authorized accounts can mint
 
-- **Fixed Supply**: Maximum of 100,000,000 CSN tokens
-- **Time-Locked Minting**: Restricted to once per year
-- **Authority Control**: Only designated mint authority can mint
-- **Token-2022 Support**: Uses the latest SPL token standard
-- **Secure State Management**: PDA-based state storage
-- **Burn Functionality**: Token holders can burn their own tokens
+Token-2022 Support: Built using the SPL Token-2022 standard
 
-## 🏗️ Architecture
+Secure PDA-based State: For mint authority and timestamp tracking
 
-### Smart Contract Components
+Built-in Burn Function: Token holders can burn their own tokens
 
-- **State Management**: PDA-based state account storing mint authority and timestamps
-- **Minting Logic**: Controlled minting with supply cap and time-lock enforcement
-- **Burning Logic**: Self-service token burning for holders
-- **Security**: Authority checks and supply validation
+Vesting Ready: Compatible with time-based token distribution via custom logic
 
-### Token Distribution (Planned)
+🏗️ Architecture
+Core Modules
+State Account: Stores mint authority, timestamps, and supply limits using a Program Derived Address (PDA)
 
-- **Staking Rewards**: 40% (40,000,000 CSN)
-- **Treasury**: 15% (15,000,000 CSN)
-- **Initial DEX Offering**: 14% (14,000,000 CSN)
-- **Liquidity Pools**: 4% (4,000,000 CSN)
-- **Marketing**: 7% (7,000,000 CSN)
+Mint Logic: Enforces mint frequency and total supply constraints
 
-## 🛠️ Development
+Burn Logic: Allows holders to burn tokens without approval
 
-### Prerequisites
+Optional Extensions:
 
-- Rust 1.70+
-- Solana CLI 1.16+
-- Anchor Framework 0.31+
+Vesting schedules per user or allocation type
 
-### Setup
+Freeze or pause authority
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/csn-token.git
-   cd csn-token
-   ```
+DAO governance integration
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+🧱 Example Token Distribution
+The original implementation included:
 
-3. **Build the program**
-   ```bash
-   anchor build
-   ```
+Staking Rewards: 40%
 
-4. **Run tests**
-   ```bash
-   anchor test
-   ```
+Treasury: 15%
 
-### Program ID
+Initial DEX Offering (IDO): 14%
 
-```
-7ZZQ1sXhFh5pkwaqGxtukNo9ma4n4VLjszzk3hChj5tN
-```
+Liquidity Pools: 4%
 
-## 📋 Smart Contract Functions
+Marketing: 7%
 
-### `initialize`
-- Creates the state PDA
-- Sets the mint authority
-- Initializes timestamps and counters
+Customize these values for your tokenomics model.
 
-### `mint_csn`
-- Mints new CSN tokens (authority only)
-- Enforces supply cap (100M maximum)
-- Enforces time-lock (once per year)
-- Updates state timestamps
+🛠️ Development Setup
+Prerequisites
+Rust 1.70+
 
-### `burn_csn`
-- Burns tokens from holder's account
-- No special restrictions
+Solana CLI 1.16+
 
-## 🔒 Security Features
+Anchor 0.31+
 
-- **Supply Cap Enforcement**: Prevents minting beyond 100M tokens
-- **Time-Lock Mechanism**: Restricts minting frequency
-- **Authority Validation**: Only authorized parties can mint
-- **PDA State**: Secure state management using Program Derived Addresses
+Local Setup
+bash
+Copy
+Edit
+git clone https://github.com/yourusername/solana-launchpad-template.git
+cd solana-launchpad-template
+npm install
+anchor build
+anchor test
+Program ID
+Update this with your deployed ID:
 
-## 📝 TODO
+php-template
+Copy
+Edit
+<YOUR_PROGRAM_ID_HERE>
+🔧 Smart Contract Instructions
+initialize
+Sets up the state account (PDA)
 
-- [ ] Multi-signature governance implementation
-- [ ] Freeze authority enforcement
-- [ ] Enhanced error handling
-- [ ] Additional security audits
+Assigns mint authority
 
-## 🤝 Contributing
+Initializes timestamps and counters
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+mint_token
+Mints new tokens (authority-only)
 
-## 📄 License
+Enforces total supply cap
 
-## ⚠️ Intellectual Property Notice
+Enforces mint time-lock
 
-This code is proprietary and protected under U.S. copyright law.  
-No license is granted for use, distribution, or modification without explicit written permission from the author.  
-Any unauthorized use may result in legal consequences.
+Updates internal state
 
-## 🔗 Links
+burn_token
+Burns tokens from the holder’s account
 
-- [Solana Documentation](https://docs.solana.com/)
-- [Anchor Framework](https://www.anchor-lang.com/)
-- [SPL Token-2022](https://spl.solana.com/token-2022)
+No permission required
 
-## 📞 Contact
+🔒 Security Highlights
+Total Supply Cap: Prevents over-minting
 
-For questions or support, please open an issue on GitHub.
+Time-Locked Minting: Prevents abuse by authority
 
----
+PDA-Based State: Ensures tamper-resistant authority tracking
 
-**Note**: This is a development version. Production deployment should include additional security audits and testing. 
+Modular Design: Easily auditable and extendable
+
+📝 TODO
+ Add multi-signature minting support
+
+ Integrate DAO-based governance
+
+ Freeze/Thaw token accounts
+
+ Additional automated tests and fuzzing
+
+🤝 Contributing
+Fork the repo
+
+Create a branch (git checkout -b feature/new-token-model)
+
+Commit changes (git commit -m 'New tokenomic preset')
+
+Push (git push origin feature/new-token-model)
+
+Create a Pull Request
+
+📄 License
+This template is provided as-is under a custom license.
+Commercial use or redistribution requires written permission.
+Forks for public or educational use should include attribution.
+
+🔗 Resources
+Solana Docs
+
+Anchor Framework
+
+SPL Token-2022 Standard
