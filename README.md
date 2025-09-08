@@ -36,8 +36,8 @@
 
 ### Prerequisites
 
-- Rust 1.70+
-- Solana CLI 1.16+
+- Rust 1.88+
+- Solana CLI 2.2+
 - Anchor Framework 0.31+
 - Node.js 18+
 - npm

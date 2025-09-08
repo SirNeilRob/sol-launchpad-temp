@@ -17,7 +17,7 @@ Complete setup instructions for running and testing the CSN Token-2022 implement
    nvm use 18
    ```
 
-2. **Rust** (1.70+)
+2. **Rust** (1.88+)
    ```bash
    # Install Rust
    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -27,10 +27,10 @@ Complete setup instructions for running and testing the CSN Token-2022 implement
    rustc --version
    ```
 
-3. **Solana CLI** (1.16+)
+3. **Solana CLI** (2.2+)
    ```bash
    # Install Solana CLI
-   sh -c "$(curl -sSfL https://release.solana.com/v1.16.0/install)"
+   sh -c "$(curl -sSfL https://release.solana.com/v2.2.0/install)"
    
    # Add to PATH
    export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
