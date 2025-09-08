@@ -1,5 +1,7 @@
 # CSN Token - Enterprise-Grade Solana Token Launchpad
 
+**This project emphasizes secure data handling and controlled access, with clear documentation for reliability
+
 **A production-ready token launchpad that prevents rug pulls and ensures fair distribution.** Built on Solana's Token-2022 standard with enterprise security features including anti-sniping protection, time-locked minting, and automated vesting controls. Every aspect prioritizes security and transparent data handling—from PDA-based state management to comprehensive audit trails. This isn't just another token contract; it's a complete launch infrastructure that protects both founders and investors.
 
 **Try it now:** `git clone https://github.com/SirNeilRob/csn-token.git && cd csn-token && ./setup.sh`
