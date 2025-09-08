@@ -1,72 +1,163 @@
-# Solana Launchpad Template – Token-2022 Implementation
+# CSN Token - Solana Token-2022 Implementation
 
-A secure and extensible token launchpad contract built on Solana using the Token-2022 standard.  
-Includes support for fixed supply tokens, controlled minting, time-locked vesting, and PDA-managed authority controls.
+A secure, controlled-minting token contract built on Solana using the Token-2022 program with fixed supply, time-locked minting, and authority controls.
 
----
+## 🚀 Quick Start
 
-## 🚀 Overview
+### Automated Setup (Recommended)
 
-This launchpad provides a reusable Solana smart contract framework for launching SPL Token-2022 assets with enhanced controls, supply caps, and vesting schedules.  
-Originally built for the CSN token, this template can be customized for any project.
+```bash
+git clone https://github.com/SirNeilRob/csn-token.git
+cd csn-token
+chmod +x setup.sh
+./setup.sh
+```
 
----
+### Manual Setup
 
-## ✨ Key Features
+```bash
+# 1. Install dependencies
+npm install --legacy-peer-deps
+cd app && npm install --legacy-peer-deps && cd ..
 
-- **Fixed Supply Enforcement**: Cap total minted tokens at a preset maximum  
-- **Time-Locked Minting**: Restrict minting frequency (e.g., once per year)  
-- **Authority Controls**: Only authorized accounts can mint  
-- **Token-2022 Support**: Built using the SPL Token-2022 standard  
-- **Secure PDA-based State**: For mint authority and timestamp tracking  
-- **Built-in Burn Function**: Token holders can burn their own tokens  
-- **Vesting Ready**: Compatible with time-based token distribution via custom logic  
+# 2. Configure Solana CLI
+solana config set --url devnet
+solana-keygen new --outfile ~/.config/solana/id.json
+solana airdrop 2
 
----
+# 3. Build and test
+anchor build
+npm test
+
+# 4. Start frontend
+cd app && npm run dev
+```
+
+## ✨ Features
+
+- **Fixed Supply**: Maximum of 100,000,000 CSN tokens
+- **Time-Locked Minting**: Restricted to once per year
+- **Authority Control**: Only designated mint authority can mint
+- **Token-2022 Support**: Uses the latest SPL token standard
+- **Secure State Management**: PDA-based state storage
+- **Burn Functionality**: Token holders can burn their own tokens
+- **Professional Frontend**: React app with Phantom wallet integration
+- **Comprehensive Security**: Anti-sniping, cooldowns, emergency pause
 
 ## 🏗️ Architecture
 
-### Core Modules
+### Smart Contract Components
 
-- **State Account**: Stores mint authority, timestamps, and supply limits using a Program Derived Address (PDA)  
-- **Mint Logic**: Enforces mint frequency and total supply constraints  
-- **Burn Logic**: Allows holders to burn tokens without approval  
+- **State Management**: PDA-based state account storing mint authority and timestamps
+- **Minting Logic**: Controlled minting with supply cap and time-lock enforcement
+- **Burning Logic**: Self-service token burning for holders
+- **Security**: Authority checks and supply validation
 
-### Optional Extensions
+### Token Distribution (Planned)
 
-- Vesting schedules per user or allocation type  
-- Freeze or pause authority  
-- DAO governance integration  
+- **Staking Rewards**: 40% (40,000,000 CSN)
+- **Treasury**: 15% (15,000,000 CSN)
+- **Initial DEX Offering**: 14% (14,000,000 CSN)
+- **Liquidity Pools**: 4% (4,000,000 CSN)
+- **Marketing**: 7% (7,000,000 CSN)
 
----
-
-## 📊 Example Token Distribution
-
-The original implementation included:
-
-- **Staking Rewards**: 40%  
-- **Treasury**: 15%  
-- **Initial DEX Offering (IDO)**: 14%  
-- **Liquidity Pools**: 4%  
-- **Marketing**: 7%  
-
-> Customize these values for your tokenomics model.
-
----
-
-## 🛠️ Development Setup
+## 🛠️ Development
 
 ### Prerequisites
 
-- Rust 1.88  
-- Solana CLI 2.2.19  
-- Anchor 0.31.1  
+- Rust 1.70+
+- Solana CLI 1.16+
+- Anchor Framework 0.31+
+- Node.js 18+
+- npm
 
-### Local Setup
+### Setup
 
-```bash
-git clone https://github.com/SirNeilRob/sol-launchpad-temp.git
-cd sol-launchpad-temp
-npm install
-anchor build
-anchor test
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/SirNeilRob/csn-token.git
+   cd csn-token
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install --legacy-peer-deps
+   cd app && npm install --legacy-peer-deps && cd ..
+   ```
+
+3. **Build the program**
+   ```bash
+   anchor build
+   ```
+
+4. **Run tests**
+   ```bash
+   npm test
+   ```
+
+### Program ID
+
+```
+7ZZQ1sXhFh5pkwaqGxtukNo9ma4n4VLjszzk3hChj5tN
+```
+
+## 📋 Smart Contract Functions
+
+### `initialize`
+- Creates the state PDA
+- Sets the mint authority
+- Initializes timestamps and counters
+
+### `mint_csn`
+- Mints new CSN tokens (authority only)
+- Enforces supply cap (100M maximum)
+- Enforces time-lock (once per year)
+- Updates state timestamps
+
+### `burn_csn`
+- Burns tokens from holder's account
+- No special restrictions
+
+## 🔒 Security Features
+
+- **Supply Cap Enforcement**: Prevents minting beyond 100M tokens
+- **Time-Lock Mechanism**: Restricts minting frequency
+- **Authority Validation**: Only authorized parties can mint
+- **PDA State**: Secure state management using Program Derived Addresses
+
+## 📝 Documentation
+
+- **[SETUP_GUIDE.md](SETUP_GUIDE.md)**: Complete setup instructions
+- **[LAUNCH_GUIDE.md](LAUNCH_GUIDE.md)**: Launch procedures and security
+- **[SECURITY_SUMMARY.md](SECURITY_SUMMARY.md)**: Security features overview
+- **[tools/README.md](tools/README.md)**: Development tools usage
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+## ⚠️ Intellectual Property Notice
+
+This code is proprietary and protected under U.S. copyright law.  
+No license is granted for use, distribution, or modification without explicit written permission from the author.  
+Any unauthorized use may result in legal consequences.
+
+## 🔗 Links
+
+- [Solana Documentation](https://docs.solana.com/)
+- [Anchor Framework](https://www.anchor-lang.com/)
+- [SPL Token-2022](https://spl.solana.com/token-2022)
+
+## 📞 Contact
+
+For questions or support, please open an issue on GitHub.
+
+---
+
+**Note**: This is a development version. Production deployment should include additional security audits and testing.
