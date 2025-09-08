@@ -1,37 +1,8 @@
-# CSN Token - Solana Token-2022 Implementation
+# CSN Token - Enterprise-Grade Solana Token Launchpad
 
-A secure, controlled-minting token contract built on Solana using the Token-2022 program with fixed supply, time-locked minting, and authority controls.
+**A production-ready token launchpad that prevents rug pulls and ensures fair distribution.** Built on Solana's Token-2022 standard with enterprise security features including anti-sniping protection, time-locked minting, and automated vesting controls. Every aspect prioritizes security and transparent data handling—from PDA-based state management to comprehensive audit trails. This isn't just another token contract; it's a complete launch infrastructure that protects both founders and investors.
 
-## 🚀 Quick Start
-
-### Automated Setup (Recommended)
-
-```bash
-git clone https://github.com/SirNeilRob/csn-token.git
-cd csn-token
-chmod +x setup.sh
-./setup.sh
-```
-
-### Manual Setup
-
-```bash
-# 1. Install dependencies
-npm install --legacy-peer-deps
-cd app && npm install --legacy-peer-deps && cd ..
-
-# 2. Configure Solana CLI
-solana config set --url devnet
-solana-keygen new --outfile ~/.config/solana/id.json
-solana airdrop 2
-
-# 3. Build and test
-anchor build
-npm test
-
-# 4. Start frontend
-cd app && npm run dev
-```
+**Try it now:** `git clone https://github.com/SirNeilRob/csn-token.git && cd csn-token && ./setup.sh`
 
 ## ✨ Features
 
