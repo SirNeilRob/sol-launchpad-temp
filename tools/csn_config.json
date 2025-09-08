@@ -1,0 +1,18 @@
+{
+  "programId": "7ZZQ1sXhFh5pkwaqGxtukNo9ma4n4VLjszzk3hChj5tN",
+  "mintAddress": "D2gaxSNT7Essm1wiao1E8cU92zgK8JpbkGrBB2YsQdBd",
+  "uniqueSeed": "10591",
+  "governancePda": "7pq1xzSJDYGpBJKD5ewmrWhYMrDskwJsEt2TxgjSboA2",
+  "securityPda": "HdJGx4XSKyaxBCa1JiHrTGAw1BpbgmBXernbh2SBRZpT",
+  "vestingPda": "Eqp2tSDvedUZEYaUT7c93LZPWkR1RDeN8ZL4BiEsK1ye",
+  "liquidityPda": "7te6mXjiNVyz6DeySZdhsoyTHXB9U6UbkBDYzTAX8UCq",
+  "distributionVaultPda": "4qQ1GQceVdatsgvyoecGNXDwTAdj5Tmyef2L8VDsirZ1",
+  "teamVaultPda": "EYMa2AgBA8SbUJLo6bL93uPJe9SrsCw492F74m2sKnAe",
+  "stakingVaultPda": "7zFnZjVguqG1hCbnNFaxwfBUmyggPG6M94sfF7hcxuJL",
+  "treasuryVaultPda": "HFygWSWJtm1KfakCMGN9Kr6pXHK25wKHyQMqCtTpYZsj",
+  "idoVaultPda": "8TJu4uD8ZqijV72BmRmMomwDY4sg8TaMVcmhoa36VEf5",
+  "lpVaultPda": "DQBQb382ChyYnrQXtAMjhLfutWVGqFCHStCVhRpdCDFZ",
+  "marketingVaultPda": "7wATABF4qCSmHEFYiigM7agGy5qgpmEs26HfGo5UmQNe",
+  "airdropVaultPda": "3X3ZKqv6UgDHMeQCeAVdkhXmDrhXQPbeLf6whbjFeQ4L",
+  "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+}

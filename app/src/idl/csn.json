@@ -1,0 +1,627 @@
+{
+  "address": "7ZZQ1sXhFh5pkwaqGxtukNo9ma4n4VLjszzk3hChj5tN",
+  "metadata": {
+    "name": "csn",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "burn_csn",
+      "docs": [
+        "Burn tokens from a TokenAccount (must be called by account owner)"
+      ],
+      "discriminator": [
+        210,
+        224,
+        110,
+        127,
+        191,
+        168,
+        99,
+        233
+      ],
+      "accounts": [
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "from",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "distribute",
+      "docs": [
+        "Distribute the launch circulating supply from the distribution account to all allocation destinations per whitepaper."
+      ],
+      "discriminator": [
+        191,
+        44,
+        223,
+        207,
+        164,
+        236,
+        126,
+        61
+      ],
+      "accounts": [
+        {
+          "name": "distribution_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  116,
+                  114,
+                  105,
+                  98,
+                  117,
+                  116,
+                  105,
+                  111,
+                  110,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "unique_seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "distribution_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "unique_seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "team_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  101,
+                  97,
+                  109,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "unique_seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "staking_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  97,
+                  107,
+                  105,
+                  110,
+                  103,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "unique_seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "unique_seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "ido_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  100,
+                  111,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "unique_seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lp_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "unique_seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "marketing_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116,
+                  105,
+                  110,
+                  103,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "unique_seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "airdrop_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  105,
+                  114,
+                  100,
+                  114,
+                  111,
+                  112,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "unique_seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "unique_seed",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "finalize",
+      "docs": [
+        "Finalize: revoke mint and freeze authorities for the mint."
+      ],
+      "discriminator": [
+        171,
+        61,
+        218,
+        56,
+        127,
+        115,
+        12,
+        217
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "unique_seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "current_authority",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "unique_seed",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "docs": [
+        "Initialize state PDA, configure mint, and mint full supply to distribution account."
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "unique_seed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "distribution_account",
+          "writable": true
+        },
+        {
+          "name": "team_account",
+          "writable": true
+        },
+        {
+          "name": "staking_account",
+          "writable": true
+        },
+        {
+          "name": "treasury_account",
+          "writable": true
+        },
+        {
+          "name": "ido_account",
+          "writable": true
+        },
+        {
+          "name": "lp_account",
+          "writable": true
+        },
+        {
+          "name": "marketing_account",
+          "writable": true
+        },
+        {
+          "name": "airdrop_account",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "mint_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "unique_seed",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "mint_csn",
+      "docs": [
+        "Mint tokens to any TokenAccount (must be called by mint authority)"
+      ],
+      "discriminator": [
+        49,
+        173,
+        113,
+        57,
+        20,
+        20,
+        49,
+        126
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "mint_authority",
+          "signer": true
+        },
+        {
+          "name": "to",
+          "writable": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "State",
+      "discriminator": [
+        216,
+        146,
+        107,
+        94,
+        104,
+        75,
+        182,
+        177
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized mint attempt"
+    },
+    {
+      "code": 6001,
+      "name": "SupplyCapExceeded",
+      "msg": "Minting would exceed the maximum supply cap"
+    },
+    {
+      "code": 6002,
+      "name": "MintLocked",
+      "msg": "Minting is currently time-locked"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidMintDecimals",
+      "msg": "Mint decimals must be 9"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidMintAuthority",
+      "msg": "Mint authority must be state PDA"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidFreezeAuthority",
+      "msg": "Freeze authority must be set (will be revoked later)"
+    }
+  ],
+  "types": [
+    {
+      "name": "State",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "minted_this_year",
+            "type": "u64"
+          },
+          {
+            "name": "mint_start_timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ]
+}

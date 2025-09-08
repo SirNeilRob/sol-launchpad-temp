@@ -63,8 +63,8 @@ describe("csn - Token-2022 Launch Flow", () => {
     
     [idoPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from("ido_vault"), new anchor.BN(uniqueSeed).toArrayLike(Buffer, "le", 8)],
-    program.programId
-  );
+      program.programId
+    );
     
     [lpPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from("lp_vault"), new anchor.BN(uniqueSeed).toArrayLike(Buffer, "le", 8)],
